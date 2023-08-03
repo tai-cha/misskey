@@ -29,10 +29,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</div>
 				<FormSection>
 					<div class="_formLinks">
+						<FormLink to="https://github.com/nadesuki/nadesuki" external>
+							<template #icon><i class="ti ti-code"></i></template>
+							{{ i18n.ts._aboutMisskey.source }}
+							<template #suffix>GitHub (nadesskey)</template>
+						</FormLink>
 						<FormLink to="https://github.com/misskey-dev/misskey" external>
 							<template #icon><i class="ti ti-code"></i></template>
 							{{ i18n.ts._aboutMisskey.source }}
-							<template #suffix>GitHub</template>
+							<template #suffix>GitHub (Misskey)</template>
 						</FormLink>
 						<FormLink to="https://crowdin.com/project/misskey" external>
 							<template #icon><i class="ti ti-language-hiragana"></i></template>
