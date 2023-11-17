@@ -5,6 +5,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { Endpoint } from '@/server/api/endpoint-base.js';
+import { IdService } from '@/core/IdService.js';
 import { SearchService } from '@/core/SearchService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { RoleService } from '@/core/RoleService.js';
@@ -40,6 +41,9 @@ export const paramDef = {
 		query: { type: 'string' },
 		sinceId: { type: 'string', format: 'misskey:id' },
 		untilId: { type: 'string', format: 'misskey:id' },
+		sinceDate: { type: 'integer' },
+		untilDate: { type: 'integer' },
+		followingOnly: { type: 'boolean', default: false },
 		limit: { type: 'integer', minimum: 1, maximum: 100, default: 10 },
 		offset: { type: 'integer', default: 0 },
 		host: {
@@ -60,6 +64,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private noteEntityService: NoteEntityService,
 		private searchService: SearchService,
 		private roleService: RoleService,
+		private IdService: IdService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const policies = await this.roleService.getUserPolicies(me ? me.id : null);
@@ -67,10 +72,25 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.unavailable);
 			}
 
+			if (ps.sinceDate) {
+				const sinceIdFromDate = this.IdService.gen(ps.sinceDate);
+				if (!ps.sinceId || ps.sinceId < sinceIdFromDate) {
+					ps.sinceId = sinceIdFromDate;
+				}
+			}
+
+			if (ps.untilDate) {
+				const untilIdFromDate = this.IdService.gen(ps.untilDate);
+				if (!ps.untilId || ps.untilId > untilIdFromDate) {
+					ps.untilId = untilIdFromDate;
+				}
+			}
+
 			const notes = await this.searchService.searchNote(ps.query, me, {
 				userId: ps.userId,
 				channelId: ps.channelId,
 				host: ps.host,
+				followingOnly: ps.followingOnly,
 			}, {
 				untilId: ps.untilId,
 				sinceId: ps.sinceId,

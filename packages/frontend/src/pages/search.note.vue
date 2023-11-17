@@ -14,6 +14,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 			<div class="_gaps_m">
 				<MkSwitch v-model="isLocalOnly">{{ i18n.ts.localOnly }}</MkSwitch>
+				<MkSwitch v-model="isFollowingOnly">フォロー中のみ</MkSwitch>
+
+				<MkFolder>
+					<template #label>範囲指定</template>
+					<MkInput v-model="sinceDate" type="date"><template #label>from</template></MkInput>
+					<MkInput v-model="untilDate" type="date"><template #label>until</template></MkInput>
+				</MkFolder>
 
 				<MkFolder>
 					<template #label>{{ i18n.ts.specifyUser }}</template>
@@ -65,6 +72,9 @@ let searchOrigin = $ref('combined');
 let notePagination = $ref();
 let user = $ref(null);
 let isLocalOnly = $ref(false);
+let isFollowingOnly = $ref(false);
+let sinceDate:string|null = $ref(null);
+let untilDate:string|null = $ref(null);
 
 function selectUser() {
 	os.selectUser().then(_user => {
@@ -101,10 +111,13 @@ async function search() {
 		params: {
 			query: searchQuery,
 			userId: user ? user.id : null,
+			followingOnly: isFollowingOnly,
 		},
 	};
 
 	if (isLocalOnly) notePagination.params.host = '.';
+	if (sinceDate) notePagination.params.sinceDate = Date.parse(sinceDate);
+	if (untilDate) notePagination.params.untilDate = Date.parse(untilDate);
 
 	key++;
 }

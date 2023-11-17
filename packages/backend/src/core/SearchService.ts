@@ -10,7 +10,7 @@ import type { Config } from '@/config.js';
 import { bindThis } from '@/decorators.js';
 import { MiNote } from '@/models/Note.js';
 import { MiUser } from '@/models/_.js';
-import type { NotesRepository } from '@/models/_.js';
+import type { NotesRepository, FollowingsRepository } from '@/models/_.js';
 import { sqlLikeEscape } from '@/misc/sql-like-escape.js';
 import { QueryService } from '@/core/QueryService.js';
 import { IdService } from '@/core/IdService.js';
@@ -73,6 +73,9 @@ export class SearchService {
 
 		@Inject(DI.notesRepository)
 		private notesRepository: NotesRepository,
+
+		@Inject(DI.followingsRepository)
+		private followingsRepository: FollowingsRepository,
 
 		private queryService: QueryService,
 		private idService: IdService,
@@ -158,6 +161,7 @@ export class SearchService {
 		userId?: MiNote['userId'] | null;
 		channelId?: MiNote['channelId'] | null;
 		host?: string | null;
+		followingOnly?: boolean;
 	}, pagination: {
 		untilId?: MiNote['id'];
 		sinceId?: MiNote['id'];
@@ -172,6 +176,12 @@ export class SearchService {
 			if (pagination.sinceId) filter.qs.push({ op: '>', k: 'createdAt', v: this.idService.parse(pagination.sinceId).date.getTime() });
 			if (opts.userId) filter.qs.push({ op: '=', k: 'userId', v: opts.userId });
 			if (opts.channelId) filter.qs.push({ op: '=', k: 'channelId', v: opts.channelId });
+			if (opts.followingOnly && me) {
+				const followees = await this.followingsRepository.findBy({ followerId: me.id });
+				const meOrFolloweeIds = [me.id, ...followees.map(x => x.followeeId)];
+
+				filter.qs.push({ op: 'or', qs: meOrFolloweeIds.map(x => ({ op: '=', k: 'userId', v: x })) });
+			}
 			if (opts.host) {
 				if (opts.host === '.') {
 					filter.qs.push({ op: 'is null', k: 'userHost' });
@@ -198,6 +208,12 @@ export class SearchService {
 				query.andWhere('note.userId = :userId', { userId: opts.userId });
 			} else if (opts.channelId) {
 				query.andWhere('note.channelId = :channelId', { channelId: opts.channelId });
+			}
+
+			if (opts.followingOnly && me) {
+				const followees = await this.followingsRepository.findBy({ followerId: me.id });
+				const meOrFolloweeIds = [me.id, ...followees.map(x => x.followeeId)];
+				query.andWhere('note.userId IN (:...meOrFolloweeIds)', { meOrFolloweeIds: meOrFolloweeIds });
 			}
 
 			query
