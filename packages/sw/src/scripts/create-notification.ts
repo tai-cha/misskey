@@ -138,7 +138,20 @@ async function composeNotification(data: PushNotificationDataMap[keyof PushNotif
 					return [t('_notification.newNote') + ': ' + getUserName(data.body.user), {
 						body: data.body.note.text ?? '',
 						icon: data.body.user.avatarUrl,
+						badge: iconUrl('bell'),
 						data,
+						actions: [
+							{
+								action: 'reply',
+								title: t('_notification._actions.reply'),
+							},
+							...((data.body.note.visibility === 'public' || data.body.note.visibility === 'home') ? [
+								{
+									action: 'renote',
+									title: t('_notification._actions.renote'),
+								},
+							] : []),
+						],
 					}];
 
 				case 'reaction': {

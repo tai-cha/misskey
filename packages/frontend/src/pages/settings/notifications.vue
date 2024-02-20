@@ -25,6 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkFolder>
 		</div>
 	</FormSection>
+	<FormLink to="/settings/notifications/note"><template #icon><i class="ti ti-bell"></i></template>{{ i18n.ts.noteNotification }}</FormLink>
 	<FormSection>
 		<div class="_gaps_m">
 			<FormLink @click="readAllNotifications">{{ i18n.ts.markAsReadAllNotifications }}</FormLink>

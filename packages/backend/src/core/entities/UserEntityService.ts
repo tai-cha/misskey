@@ -16,7 +16,7 @@ import { USER_ACTIVE_THRESHOLD, USER_ONLINE_THRESHOLD } from '@/const.js';
 import type { MiLocalUser, MiPartialLocalUser, MiPartialRemoteUser, MiRemoteUser, MiUser } from '@/models/User.js';
 import { birthdaySchema, descriptionSchema, localUsernameSchema, locationSchema, nameSchema, passwordSchema } from '@/models/User.js';
 import { MiNotification } from '@/models/Notification.js';
-import type { UsersRepository, UserSecurityKeysRepository, FollowingsRepository, FollowRequestsRepository, BlockingsRepository, MutingsRepository, DriveFilesRepository, NoteUnreadsRepository, UserNotePiningsRepository, UserProfilesRepository, AnnouncementReadsRepository, AnnouncementsRepository, MiUserProfile, RenoteMutingsRepository, UserMemoRepository } from '@/models/_.js';
+import type { UsersRepository, UserSecurityKeysRepository, FollowingsRepository, FollowRequestsRepository, BlockingsRepository, MutingsRepository, DriveFilesRepository, NoteUnreadsRepository, UserNotePiningsRepository, UserProfilesRepository, AnnouncementReadsRepository, AnnouncementsRepository, MiUserProfile, RenoteMutingsRepository, UserMemoRepository, NoteNotificationsRepository } from '@/models/_.js';
 import { bindThis } from '@/decorators.js';
 import { RoleService } from '@/core/RoleService.js';
 import { ApPersonService } from '@/core/activitypub/models/ApPersonService.js';
@@ -88,6 +88,9 @@ export class UserEntityService implements OnModuleInit {
 		@Inject(DI.renoteMutingsRepository)
 		private renoteMutingsRepository: RenoteMutingsRepository,
 
+		@Inject(DI.noteNotificationsRepository)
+		private noteNotificationsRepository: NoteNotificationsRepository,
+
 		@Inject(DI.driveFilesRepository)
 		private driveFilesRepository: DriveFilesRepository,
 
@@ -147,6 +150,7 @@ export class UserEntityService implements OnModuleInit {
 			isBlocked,
 			isMuted,
 			isRenoteMuted,
+			isNoteSubscribing,
 		] = await Promise.all([
 			this.followingsRepository.findOneBy({
 				followerId: me,
@@ -194,6 +198,12 @@ export class UserEntityService implements OnModuleInit {
 					muteeId: target,
 				},
 			}),
+			this.noteNotificationsRepository.exist({
+				where: {
+					userId: me,
+					targetUserId: target,
+				},
+			}),
 		]);
 
 		return {
@@ -207,6 +217,7 @@ export class UserEntityService implements OnModuleInit {
 			isBlocked,
 			isMuted,
 			isRenoteMuted,
+			isNoteSubscribing,
 		};
 	}
 
@@ -505,8 +516,11 @@ export class UserEntityService implements OnModuleInit {
 				isBlocked: relation.isBlocked,
 				isMuted: relation.isMuted,
 				isRenoteMuted: relation.isRenoteMuted,
-				notify: relation.following?.notify ?? 'none',
 				withReplies: relation.following?.withReplies ?? false,
+				isNoteSubscribing: relation.isNoteSubscribing,
+				//純正Misskeyとの互換性を持たせるため
+				//純正通知: https://github.com/misskey-dev/misskey/commit/e3f151e2307e4c0d7b9cdfc7deba2ff028adce03
+				notify: relation.isNoteSubscribing === false ? 'none' : 'normal',
 			} : {}),
 		} as Promiseable<Packed<S>>;
 

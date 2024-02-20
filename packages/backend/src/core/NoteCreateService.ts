@@ -41,6 +41,7 @@ import { NotificationService } from '@/core/NotificationService.js';
 import { WebhookService } from '@/core/WebhookService.js';
 import { HashtagService } from '@/core/HashtagService.js';
 import { AntennaService } from '@/core/AntennaService.js';
+import { NoteNotificationService } from '@/core/NoteNotificationService.js';
 import { QueueService } from '@/core/QueueService.js';
 import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
 import { UserEntityService } from '@/core/entities/UserEntityService.js';
@@ -205,6 +206,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		private federatedInstanceService: FederatedInstanceService,
 		private hashtagService: HashtagService,
 		private antennaService: AntennaService,
+		private noteNotificationService: NoteNotificationService,
 		private webhookService: WebhookService,
 		private featuredService: FeaturedService,
 		private remoteUserResolveService: RemoteUserResolveService,
@@ -379,6 +381,10 @@ export class NoteCreateService implements OnApplicationShutdown {
 			}
 		}
 
+		if (mentionedUsers.length > (await this.roleService.getUserPolicies(user.id)).mentionLimit) {
+			throw new Error('Too many mentions');
+		}
+
 		const note = await this.insertNote(user, data, tags, emojis, mentionedUsers);
 
 		setImmediate('post created', { signal: this.#shutdownController.signal }).then(
@@ -521,6 +527,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		this.pushToTl(note, user);
 
 		this.antennaService.addNoteToAntennas(note, user);
+		this.noteNotificationService.sendNotificationToSubscriber(note, user);
 
 		if (data.reply) {
 			this.saveReply(data.reply, note);
@@ -888,6 +895,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 				}
 
 				this.fanoutTimelineService.push(`homeTimeline:${following.followerId}`, note.id, meta.perUserHomeTimelineCacheMax, r);
+				if (note.userHost == null) {
+					this.fanoutTimelineService.push(`localHomeTimeline:${following.followerId}`, note.id, meta.perUserHomeTimelineCacheMax, r);
+				}
 				if (note.fileIds.length > 0) {
 					this.fanoutTimelineService.push(`homeTimelineWithFiles:${following.followerId}`, note.id, meta.perUserHomeTimelineCacheMax / 2, r);
 				}

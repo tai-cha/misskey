@@ -15,6 +15,7 @@ body:
       description: Describe the specific problem or need you think this feature will solve, and who it will help.
     validations:
       required: true
+
   - type: checkboxes
     attributes:
       label: Do you want to implement this feature yourself?

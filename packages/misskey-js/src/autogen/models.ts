@@ -14,6 +14,7 @@ export type App = components['schemas']['App'];
 export type Note = components['schemas']['Note'];
 export type NoteReaction = components['schemas']['NoteReaction'];
 export type NoteFavorite = components['schemas']['NoteFavorite'];
+export type NoteNotification = components['schemas']['NoteNotification'];
 export type Notification = components['schemas']['Notification'];
 export type DriveFile = components['schemas']['DriveFile'];
 export type DriveFolder = components['schemas']['DriveFolder'];

@@ -375,6 +375,10 @@ import type {
 	RenoteMuteDeleteRequest,
 	RenoteMuteListRequest,
 	RenoteMuteListResponse,
+	NoteNotificationCreateRequest,
+	NoteNotificationDeleteRequest,
+	NoteNotificationListRequest,
+	NoteNotificationListResponse,
 	MyAppsRequest,
 	MyAppsResponse,
 	NotesRequest,
@@ -809,6 +813,9 @@ export type Endpoints = {
 	'renote-mute/create': { req: RenoteMuteCreateRequest; res: EmptyResponse };
 	'renote-mute/delete': { req: RenoteMuteDeleteRequest; res: EmptyResponse };
 	'renote-mute/list': { req: RenoteMuteListRequest; res: RenoteMuteListResponse };
+	'note-notification/create': { req: NoteNotificationCreateRequest; res: EmptyResponse };
+	'note-notification/delete': { req: NoteNotificationDeleteRequest; res: EmptyResponse };
+	'note-notification/list': { req: NoteNotificationListRequest; res: NoteNotificationListResponse };
 	'my/apps': { req: MyAppsRequest; res: MyAppsResponse };
 	'notes': { req: NotesRequest; res: NotesResponse };
 	'notes/children': { req: NotesChildrenRequest; res: NotesChildrenResponse };

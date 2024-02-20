@@ -113,6 +113,10 @@ export const defaultStore = markRaw(new Storage('base', {
 		where: 'account',
 		default: false,
 	},
+	filenameRandomize: {
+		where: 'account',
+		default: false,
+	},
 	memo: {
 		where: 'account',
 		default: null,
@@ -132,6 +136,10 @@ export const defaultStore = markRaw(new Storage('base', {
 	mutedAds: {
 		where: 'account',
 		default: [] as string[],
+	},
+	showLocalTimelineBelowPublic: {
+		where: 'account',
+		default: false,
 	},
 
 	menu: {

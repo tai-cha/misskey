@@ -121,6 +121,7 @@ describe('ユーザー', () => {
 			isBlocking: user.isBlocking ?? false,
 			isBlocked: user.isBlocked ?? false,
 			isMuted: user.isMuted ?? false,
+			isNoteSubscribing: user.isSubscribing ?? false,
 			isRenoteMuted: user.isRenoteMuted ?? false,
 			notify: user.notify ?? 'none',
 			withReplies: user.withReplies ?? false,
