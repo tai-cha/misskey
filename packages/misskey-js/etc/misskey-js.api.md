@@ -431,6 +431,9 @@ type AntennasCreateRequest = operations['antennas___create']['requestBody']['con
 type AntennasCreateResponse = operations['antennas___create']['responses']['200']['content']['application/json'];
 
 // @public (undocumented)
+type AntennasDeleteNoteRequest = operations['antennas___delete-note']['requestBody']['content']['application/json'];
+
+// @public (undocumented)
 type AntennasDeleteRequest = operations['antennas___delete']['requestBody']['content']['application/json'];
 
 // @public (undocumented)
@@ -1365,6 +1368,7 @@ declare namespace entities {
         AntennasCreateRequest,
         AntennasCreateResponse,
         AntennasDeleteRequest,
+        AntennasDeleteNoteRequest,
         AntennasListResponse,
         AntennasNotesRequest,
         AntennasNotesResponse,

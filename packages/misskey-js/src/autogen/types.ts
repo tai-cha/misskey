@@ -879,6 +879,15 @@ export type paths = {
      */
     post: operations['antennas___delete'];
   };
+  '/antennas/delete-note': {
+    /**
+     * antennas/delete-note
+     * @description No description provided.
+     *
+     * **Credential required**: *Yes* / **Permission**: *write:account*
+     */
+    post: operations['antennas___delete-note'];
+  };
   '/antennas/list': {
     /**
      * antennas/list
@@ -10972,6 +10981,60 @@ export type operations = {
         'application/json': {
           /** Format: misskey:id */
           antennaId: string;
+        };
+      };
+    };
+    responses: {
+      /** @description OK (without any results) */
+      204: {
+        content: never;
+      };
+      /** @description Client error */
+      400: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Authentication error */
+      401: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Forbidden error */
+      403: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description I'm Ai */
+      418: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+      /** @description Internal server error */
+      500: {
+        content: {
+          'application/json': components['schemas']['Error'];
+        };
+      };
+    };
+  };
+  /**
+   * antennas/delete-note
+   * @description No description provided.
+   *
+   * **Credential required**: *Yes* / **Permission**: *write:account*
+   */
+  'antennas___delete-note': {
+    requestBody: {
+      content: {
+        'application/json': {
+          /** Format: misskey:id */
+          antennaId: string;
+          /** Format: misskey:id */
+          noteId: string;
         };
       };
     };
