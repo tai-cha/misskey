@@ -178,6 +178,7 @@ export function getNoteMenu(props: {
 	translating: Ref<boolean>;
 	isDeleted: Ref<boolean>;
 	currentClip?: Misskey.entities.Clip;
+	currentAntenna?: Misskey.entities.Antenna;
 }) {
 	const appearNote = getAppearNote(props.note);
 
@@ -253,6 +254,15 @@ export function getNoteMenu(props: {
 		props.isDeleted.value = true;
 	}
 
+	async function removeNoteFromAntenna(): Promise<void> {
+		if (props.currentAntenna == null) return;
+		os.apiWithDialog('antennas/delete-note', {
+			antennaId: props.currentAntenna.id,
+			noteId: appearNote.id,
+		});
+		props.isDeleted.value = true;
+	}
+
 	async function promote(): Promise<void> {
 		const { canceled, result: days } = await os.inputNumber({
 			title: i18n.ts.numberOfDays,
@@ -302,6 +312,15 @@ export function getNoteMenu(props: {
 				text: i18n.ts.unclip,
 				danger: true,
 				action: unclip,
+			}, { type: 'divider' });
+		}
+
+		if (props.currentAntenna != null) {
+			menuItems.push({
+				icon: 'ti ti-backspace',
+				text: i18n.ts.removeNoteFromAntenna,
+				danger: true,
+				action: removeNoteFromAntenna,
 			}, { type: 'divider' });
 		}
 
