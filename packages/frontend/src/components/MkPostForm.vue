@@ -22,6 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template v-if="!(channel != null && fixed)">
 				<button v-if="channel == null" ref="visibilityButton" v-click-anime v-tooltip="i18n.ts.visibility" :class="['_button', $style.headerRightItem, $style.visibility]" @click="setVisibility">
 					<span v-if="visibility === 'public'"><i class="ti ti-world"></i></span>
+					<span v-if="visibility === 'public_non_ltl'"><i class="ti ti-broadcast"></i></span>
 					<span v-if="visibility === 'home'"><i class="ti ti-home"></i></span>
 					<span v-if="visibility === 'followers'"><i class="ti ti-lock"></i></span>
 					<span v-if="visibility === 'specified'"><i class="ti ti-mail"></i></span>
@@ -339,6 +340,18 @@ if (props.reply && ['home', 'followers', 'specified'].includes(props.reply.visib
 	}
 }
 
+// #region semi-public note
+// セミパブリックノートへのリプライは元の公開範囲を引き継ぐ
+if (props.reply && props.reply.dontShowOnLtl === true && $i.policies.canPublicNonLtlNote) {
+	visibility.value = 'public_non_ltl';
+}
+
+// 自身のセミパブリックノートへのリプライである場合かつパブリック投稿へのリプライでセミパブリック投稿にする
+if (props.reply && props.reply.visibility === 'public' && props.reply.reply?.userId === $i.id && props.reply.reply?.dontShowOnLtl === true) {
+	visibility.value = 'public_non_ltl';
+}
+// #endregion
+
 if (props.specified) {
 	visibility.value = 'specified';
 	pushVisibleUser(props.specified);
@@ -461,6 +474,7 @@ function setVisibility() {
 		isSilenced: $i.isSilenced,
 		localOnly: localOnly.value,
 		src: visibilityButton.value,
+		isPublicNonLtlRestrected: $i.policies.canPublicNonLtlNote !== true || props.mock,
 		...(props.reply ? { isReplyVisibilitySpecified: props.reply.visibility === 'specified' } : {}),
 	}, {
 		changeVisibility: v => {
