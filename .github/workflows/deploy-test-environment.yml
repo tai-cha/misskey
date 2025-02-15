@@ -18,6 +18,9 @@ on:
         required: false
         default: ''
 
+env:
+  COREPACK_DEFAULT_TO_LATEST: 0
+
 jobs:
   get-pr-ref:
     runs-on: ubuntu-latest
