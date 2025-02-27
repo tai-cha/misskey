@@ -261,5 +261,10 @@ export const packedNoteSchema = {
 			type: 'string',
 			optional: true, nullable: true,
 		},
+
+		dontShowOnLtl: {
+			type: 'boolean',
+			optional: false, nullable: false,
+		},
 	},
 } as const;

@@ -4187,6 +4187,7 @@ export type components = {
       reactionAndUserPairCache?: string[];
       clippedCount?: number;
       myReaction?: string | null;
+      dontShowOnLtl: boolean;
     };
     NoteReaction: {
       /**
@@ -22435,7 +22436,7 @@ export type operations = {
            * @default public
            * @enum {string}
            */
-          visibility?: 'public' | 'home' | 'followers' | 'specified';
+          visibility?: 'public' | 'public_non_ltl' | 'home' | 'followers' | 'specified';
           visibleUserIds?: string[];
           cw?: string | null;
           /** @default false */
